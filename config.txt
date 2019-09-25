@@ -1,0 +1,13 @@
+# Remove blacklist ssh to NCM
+:if ([/ip firewall address-list find address="192.168.1.127"]!= "") do={/ip firewall address-list remove [find address=192.168.1.127 list~"ssh"]}
+
+# Check Monitoring Access to NCM
+:if ([/ip firewall address-list find list="Monitoring"]!= "") do={/ip firewall address-list add list="Monitoring" address=192.168.1.127}
+
+# Check Remote Access to NCM
+:if ([/ip firewall address-list find list="Remote"]!= "") do={/ip firewall address-list add list="Remote" address=192.168.1.127}
+
+# Set SNMP to Mikrotik
+:if ([:len [/snmp community find name="test"]] = 0) do={/snmp community add name=test write-access=no read-access=yes addresses=0.0.0.0/0}
+/snmp community set numbers=test write-access=no read-access=yes addresses=0.0.0.0/0
+/snmp set trap-community=test trap-version=2 enabled=yes
